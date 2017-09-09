@@ -51,13 +51,11 @@ public class Joystick : MonoBehaviour
         }
     }
 
-    #if UNITY_EDITOR
     private Vector3 _prevMousePos = Vector3.zero;
-#endif
 
     private void Start()
     {
-        #if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
         _prevMousePos = Camera.main.WorldToScreenPoint(transform.position);
 #endif
     }
@@ -68,7 +66,7 @@ private bool UpdateAllowed
         {
 #if UNITY_ANDROID
             return Input.touchCount == 1;
-#elif UNITY_EDITOR
+#elif UNITY_EDITOR || UNITY_STANDALONE_WIN
             return Input.GetMouseButton(0);
     #endif
         }
@@ -90,7 +88,7 @@ private bool UpdateAllowed
         {
             _time += Time.deltaTime * returnVel;
             transform.position = Vector3.Lerp(_retPosition, center.position, _time);
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
             _prevMousePos = Camera.main.WorldToScreenPoint(transform.position);
 #endif
         }
@@ -125,7 +123,7 @@ private bool UpdateAllowed
                 var touch = Input.touches[0];
                 var delta = touch.deltaPosition;
                 var position = touch.position;
-#elif UNITY_EDITOR
+#elif UNITY_EDITOR || UNITY_STANDALONE_WIN
                 var delta = (Vector2)(Input.mousePosition - _prevMousePos);
                 _prevMousePos = Input.mousePosition;
                 var position = _prevMousePos;
@@ -142,7 +140,7 @@ private bool UpdateAllowed
 #if UNITY_ANDROID
                 var touch = Input.touches[0];
                 var position = touch.position;
-#elif UNITY_EDITOR
+#elif UNITY_EDITOR || UNITY_STANDALONE_WIN
                 var position = Input.mousePosition;
 #endif
                 var ray = Camera.main.ScreenPointToRay(position);
@@ -151,8 +149,8 @@ private bool UpdateAllowed
                 if (hits.Any(x => x.collider.gameObject == gameObject))
                 {
                     InUse = true;
-#if UNITY_UNITY_EDITOR
-                    prevMousePos = Input.mousePosition;
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
+                    _prevMousePos = Input.mousePosition;
 #endif
                     EndJoystickReutrn();
                     //
