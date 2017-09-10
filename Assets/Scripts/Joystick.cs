@@ -128,9 +128,13 @@ private bool UpdateAllowed
                 _prevMousePos = Input.mousePosition;
                 var position = _prevMousePos;
 #endif
-                var nextPos = transform.position + (Vector3)delta * sens;
+                var worldPosition = Camera.main.ScreenToWorldPoint(position);
+
+                worldPosition.z = transform.position.z;
+
+                var nextPos = worldPosition; // transform.position + (Vector3)delta * sens;
                 if (Vector3.Distance(center.position, nextPos) < maxDist)
-                    transform.position = nextPos;  
+                    transform.position = nextPos;
             }
         }
         else
