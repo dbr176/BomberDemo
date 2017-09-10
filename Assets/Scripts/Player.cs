@@ -5,11 +5,15 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public float velocity = 0.01f;
+    public float minRaycastDist = 1.0f;
 
     private bool _isMoving;
     private Vector3 _moveFinish;
-    private Vector3 _moveStart;
     private Vector3 _direction;
+
+    private float _moveOnLineMaxDist = 0.2f;
+    private float _minDistToCenter = 0.05f;
+    private float _parallelDirsAngle = 0.01f;
 
     public bool IsMoving
     {
@@ -33,18 +37,16 @@ public class Player : MonoBehaviour
 
     protected virtual bool Move(Vector3 direction, float dist)
     {
-        //if (_isMoving) return false;
-
-        var moveOnLine = Vector3.Distance(transform.position, _moveFinish) < 0.2;
-        var onTileCenter = Vector3.Distance(Round(transform.position), transform.position) < 0.05;
-        var parallelDirection = Vector3.Angle(_direction, -direction) < 0.01;
+        var moveOnLine = Vector3.Distance(transform.position, _moveFinish) < _moveOnLineMaxDist;
+        var onTileCenter = Vector3.Distance(Round(transform.position), transform.position) < _minDistToCenter;
+        var parallelDirection = Vector3.Angle(_direction, -direction) < _parallelDirsAngle;
 
         if (onTileCenter && !_isMoving)
             transform.position = Round(transform.position);
 
         if ((parallelDirection && moveOnLine) || onTileCenter)
         {
-            var hit = Physics2D.Raycast(transform.position, direction, dist);
+            var hit = Physics2D.Raycast(transform.position, direction, Mathf.Max(minRaycastDist, dist));
 
             if (hit.collider != null)
             {
@@ -54,7 +56,6 @@ public class Player : MonoBehaviour
 
             _direction = direction;
             _moveFinish = Round(direction + transform.position);
-            _moveStart = transform.position;
 
             return true;
         }
@@ -68,24 +69,24 @@ public class Player : MonoBehaviour
             transform.position += _direction * velocity;
     }
 
-    public bool MoveLeft()
+    public bool MoveLeft(float v = 1.0f)
     {
-        return Move(Vector2.left, 1.0f);
+        return Move(Vector2.left, v);
     }
 
-    public bool MoveRight()
+    public bool MoveRight(float v = 1.0f)
     {
-        return Move(Vector2.right, 1.0f);
+        return Move(Vector2.right, v);
     }
 
-    public bool MoveUp()
+    public bool MoveUp(float v = 1.0f)
     {
-        return Move(Vector2.up, 1.0f);
+        return Move(Vector2.up, v);
     }
 
-    public bool MoveDown()
+    public bool MoveDown(float v = 1.0f)
     {
-        return Move(Vector2.down, 1.0f);
+        return Move(Vector2.down, v);
     }
 
 }

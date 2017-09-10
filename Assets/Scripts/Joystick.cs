@@ -10,13 +10,21 @@ public class Joystick : MonoBehaviour
     public float maxDist = 3.0f;
     public float sens = 0.01f;
     public float returnVel = 5.0f;
-    public float distToMove = 1.5f;
+    public float distToMove = 1.0f;
 
     private float _time = 0.0f;
 
     public bool InUse
     {
         get; protected set;
+    }
+
+    public float Velocity
+    {
+        get
+        {
+            return sens * DistanceToCenter() / maxDist;
+        }
     }
 
     public JoystickDirection Direction

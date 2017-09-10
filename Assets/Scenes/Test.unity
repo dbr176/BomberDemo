@@ -363,7 +363,7 @@ MonoBehaviour:
   maxDist: 1
   sens: 0.01
   returnVel: 5
-  distToMove: 0.4
+  distToMove: 0.25
 --- !u!1 &1407167575
 GameObject:
   m_ObjectHideFlags: 0
