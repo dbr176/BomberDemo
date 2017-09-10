@@ -9,12 +9,14 @@ public class JoystickInput : MonoBehaviour
 
     private void Update()
     {
+        player.IsMoving = true;
         switch(joystick.Direction)
         {
             case JoystickDirection.Down: player.MoveDown(); break;
             case JoystickDirection.Up: player.MoveUp(); break;
             case JoystickDirection.Left: player.MoveLeft(); break;
             case JoystickDirection.Right: player.MoveRight(); break;
+            case JoystickDirection.None: player.IsMoving = false; break;
         }
     }
 }

@@ -4,43 +4,68 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public float velocity = 4.0f;
+    public float velocity = 0.01f;
 
-    private float _time;
     private bool _isMoving;
     private Vector3 _moveFinish;
     private Vector3 _moveStart;
+    private Vector3 _direction;
+
+    public bool IsMoving
+    {
+        get
+        {
+            return _isMoving;
+        }
+        set
+        {
+            _isMoving = value;
+        }
+    }
+
+    private Vector3 Round(Vector3 v)
+    {
+        return new Vector3(
+            Mathf.Round(v.x),
+            Mathf.Round(v.y),
+            Mathf.Round(v.z));
+    }
 
     protected virtual bool Move(Vector3 direction, float dist)
     {
-        if (_isMoving) return false;
+        //if (_isMoving) return false;
 
-        var hit = Physics2D.Raycast(transform.position, direction, dist);
+        var moveOnLine = Vector3.Distance(transform.position, _moveFinish) < 0.2;
+        var onTileCenter = Vector3.Distance(Round(transform.position), transform.position) < 0.05;
+        var parallelDirection = Vector3.Angle(_direction, -direction) < 0.01;
 
-        if (hit.collider != null)
-            return false;
+        if (onTileCenter && !_isMoving)
+            transform.position = Round(transform.position);
 
-        _isMoving = true;
-        _moveFinish = direction + transform.position;
-        _moveStart = transform.position;
-        _time = 0;
+        if ((parallelDirection && moveOnLine) || onTileCenter)
+        {
+            var hit = Physics2D.Raycast(transform.position, direction, dist);
 
-        return true;
+            if (hit.collider != null)
+            {
+                _isMoving = false;
+                return false;
+            }
+
+            _direction = direction;
+            _moveFinish = Round(direction + transform.position);
+            _moveStart = transform.position;
+
+            return true;
+        }
+
+        return false;
     } 
 
     protected virtual void Update()
     {
-        if (_time > 1.0)
-        {
-            _isMoving = false;
-            transform.position = _moveFinish;
-        }
-        if (_isMoving)
-        {
-            var pos = Vector3.Lerp(_moveStart, _moveFinish, _time);
-            transform.position = pos;
-            _time += Time.deltaTime * velocity;
-        }
+        if (IsMoving)
+            transform.position += _direction * velocity;
     }
 
     public bool MoveLeft()
